@@ -490,7 +490,8 @@ rspec
 ### Who wrote it?
 
 Classy Hash was written by Mike Bourgeous for API validation and documentation
-in internal DeseretBook.com systems.
+in internal DeseretBook.com systems, and subsequently enhanced by inside and
+outside contributors.  See the git history for details.
 
 ### Alternatives
 
@@ -504,4 +505,4 @@ considered before deciding to roll our own:
 ### License
 
 Classy Hash is released under the MIT license (see the `LICENSE` file for the
-license text and copyright notice).
+license text and copyright notice, and the git history for more contributors).
