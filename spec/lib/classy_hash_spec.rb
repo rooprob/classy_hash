@@ -82,7 +82,10 @@ RSpec.describe ClassyHash do
         k10: lambda {|value| (value.is_a?(Integer) && value.odd?) ? true : 'an odd integer'},
 
         # :k11 can be missing, a string, or an array of integers, nils, and booleans
-        k11: [:optional, String, [[Integer, NilClass, FalseClass]]]
+        k11: [:optional, String, [[Integer, NilClass, FalseClass]]],
+
+        # :k12 can be an array of either schema_a or schema_b
+        k12: [ [[{ a: String }, { b: Numeric }]] ]
       },
 
       good: [
@@ -116,8 +119,9 @@ RSpec.describe ClassyHash do
               [-5, -10, -15],
             ]
           },
-          k10: 7
+          k10: 7,
           # :k11 is optional
+          k12: [ { a: 'foo' }, { a: 'bar' }, { b: 42 } ]
         },
         {
           k1: 'V1',
@@ -145,7 +149,8 @@ RSpec.describe ClassyHash do
             opt4: []
           },
           k10: -3,
-          k11: 'K11 can be a string'
+          k11: 'K11 can be a string',
+          k12: [ { b: 42 }, { b: 7 }, { a: 'bar' } ]
         },
         {
           k1: 'V1',
@@ -177,7 +182,8 @@ RSpec.describe ClassyHash do
             ]
           },
           k10: -3,
-          k11: 'K11 is a string here'
+          k11: 'K11 is a string here',
+          k12: [ { b: 42 }, { b: 7 } ]
         },
         {
           k1: 'V1',
@@ -218,7 +224,8 @@ RSpec.describe ClassyHash do
             true,
             false,
             1<<150
-          ]
+          ],
+          k12: [ { a: 'forty-two' }, { a: 'seven' } ]
         },
         {
           k1: 'V1',
@@ -259,7 +266,8 @@ RSpec.describe ClassyHash do
             true,
             false,
             1<<150
-          ]
+          ],
+          k12: [ { a: 'single' } ]
         },
       ],
 
@@ -462,6 +470,50 @@ RSpec.describe ClassyHash do
           }
         ],
         [
+          /^:k12/,
+          {
+            k1: 'V1',
+            k2: 'V2',
+            k3: -3,
+            k4: 4.4,
+            k5: true,
+            k6: false,
+            k7: {
+              n1: 'Hi there',
+              n2: 'This is a nested hash',
+              n3: {
+                d1: 0.35
+              }
+            },
+            k8: [1, 2, 3, 4, 5],
+            k9: {
+              opt1: "opt1",
+              opt3: [
+                {a: -5},
+                {a: nil},
+                'str3'
+              ],
+              opt4: [
+                [1, 2, 3, 4, 5],
+                (6..10).to_a,
+                [],
+                [-5, -10, -15],
+              ]
+            },
+            k10: -3,
+            k11: [
+              3,
+              4,
+              5,
+              nil,
+              true,
+              false,
+              1
+            ],
+            k12: [ { a: 'first' }, { a: 'second' } , { c: 'illegal' }]
+          }
+        ],
+        [
           /^:k8.*\/ints\//,
           {
             k1: 'V1',
@@ -610,7 +662,7 @@ RSpec.describe ClassyHash do
     end
 
     it 'rejects invalid arrays with schemas' do
-      expect { ClassyHash.validate({a: [{c: 1}, {b: 2.1}, 5]}, {a: [[{b: Numeric}, Integer]]}) }.to raise_error(/present/)
+      expect { ClassyHash.validate({a: [{c: 1}, {b: 2.1}, 5]}, {a: [[{b: Numeric}, Integer]]}) }.to raise_error(/is not one of/)
       expect { ClassyHash.validate({a: [{b: 1}, {b: 2.1}, 5.0]}, {a: [[{b: Numeric}, Integer]]}) }.to raise_error(/\[2\]/)
     end
 

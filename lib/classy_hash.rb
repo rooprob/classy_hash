@@ -56,16 +56,23 @@ module ClassyHash
     return if constraints.include?(value.class)
 
     error = nil
-    constraints.each do |c|
+    constraints.each_index do |idx|
+      c = constraints[idx]
       next if c == :optional
       begin
         self.check_one(key, value, c, parent_path)
         return
       rescue => e
         # Throw schema and array errors immediately
-        if (c.is_a?(Hash) && value.is_a?(Hash)) ||
-          (c.is_a?(Array) && value.is_a?(Array) && c.length == 1 && c.first.is_a?(Array))
+        if (c.is_a?(Array) && value.is_a?(Array) && c.length == 1 && c.first.is_a?(Array))
           raise e
+        end
+        if (c.is_a?(Hash) && value.is_a?(Hash))
+          #puts "->postponing immediate throw because contrains: #{constraints.inspect}, c: #{c.inspect}, value:#{value.inspect}"
+          # Raise Exception if we've reached the end of multiple contraint HASHes
+          # with this EOF contraints test and iterator look-ahead.
+          # raise e if idx == constraints.length - 1 && constraints.collect {|x|x.respond_to?(:each)}.length > 1
+
         end
       end
     end
